@@ -36,4 +36,18 @@ public class MessageService {
   public List<Message> getMessages() {
     return messageRepository.findAll();
   }
+
+  public void sendMessageToFailedQueue(String message, Exception e) {
+    streamBridge.send("failedProducer-out-0",
+        MessageBuilder
+            .withPayload(message)
+            .build());
+    log.error("Message: {} was sent to the failed exchange: {} with error:",
+        message, rabbitProperties.getExchangeName(), e);
+  }
+
+  public void saveMessage(String message) {
+    log.info("Saving message: {} to the persistent store.", message);
+    messageRepository.save(Message.builder().message(message).build());
+  }
 }
