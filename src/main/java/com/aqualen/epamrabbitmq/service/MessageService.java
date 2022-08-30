@@ -25,7 +25,7 @@ public class MessageService {
 
   @SneakyThrows
   public void publishMessage(String message) {
-    streamBridge.send("publisher-out-0",
+    streamBridge.send("messageProducer-out-0",
         MessageBuilder
             .withPayload(message)
             .setHeader(ROUTING_KEY_HEADER, rabbitProperties.getRoutingKey())
