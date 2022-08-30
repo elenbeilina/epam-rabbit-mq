@@ -1,13 +1,15 @@
 package com.aqualen.epamrabbitmq.service;
 
-import com.aqualen.epamrabbitmq.exception.NotRetryableException;
 import com.aqualen.epamrabbitmq.properties.RabbitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.ImmediateRequeueAmqpException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -19,8 +21,6 @@ public class MessageConsumers {
   private final MessageService messageService;
   @Value("${spring.cloud.stream.bindings.queue1Consumer-in-0.group}")
   private String queue1Name;
-  @Value("${spring.cloud.stream.bindings.queue2Consumer-in-0.group}")
-  private String queue2Name;
 
   @Bean
   public Consumer<String> queue1Consumer() {
@@ -29,14 +29,15 @@ public class MessageConsumers {
   }
 
   @Bean
-  public Consumer<String> queue2Consumer() {
+  public Consumer<Message<String>> queue2Consumer() {
     return (message) -> {
-      try {
-        new RetryCommand<>(rabbitProperties.getRetries(), rabbitProperties.getInterval())
-            .run(() -> throwExceptionWhileProcessing(message));
-      } catch (NotRetryableException e) {
-        messageService.sendMessageToFailedQueue(message, e);
+      AtomicInteger deliveryAttempt = message.getHeaders().get("deliveryAttempt", AtomicInteger.class);
+      if (deliveryAttempt.get() > rabbitProperties.getRetries()) {
+        // giving up - don't send to DLX, instead send to failed exchange
+        // TODO think about copying headers with exception details
+        messageService.saveMessage(message.getPayload());
       }
+      throwExceptionWhileProcessing(message.getPayload());
     };
   }
 
@@ -47,6 +48,8 @@ public class MessageConsumers {
 
 
   private String throwExceptionWhileProcessing(String message) {
-    throw new IllegalArgumentException(String.format("Exception happened, while processing the message: %s!", message));
+    throw new ImmediateRequeueAmqpException(
+        String.format("Exception happened, while processing the message: %s!", message
+        ));
   }
 }
