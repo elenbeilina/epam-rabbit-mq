@@ -1,0 +1,73 @@
+{
+  "rabbit_version": "3.9.15",
+  "rabbitmq_version": "3.9.15",
+  "product_name": "RabbitMQ",
+  "product_version": "3.9.15",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "JKySAJlVP1ISOLN3qBk3yzs4NCeJXpA9bHUIBh3tW3BB3eaZ",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    },
+    {
+      "name": "task-1"
+    },
+    {
+      "name": "task-2"
+    },
+    {
+      "name": "task-3"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "guest",
+      "vhost": "task-1",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "guest",
+      "vhost": "task-2",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "guest",
+      "vhost": "task-3",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-OOu9WTcu1V_77jTp4ZIQrw"
+    }
+  ],
+  "policies": [],
+  "queues": [],
+  "exchanges": [],
+  "bindings": []
+}
