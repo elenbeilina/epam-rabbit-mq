@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -31,13 +32,13 @@ public class MessageConsumers {
   @Bean
   public Consumer<Message<String>> queue2Consumer() {
     return (message) -> {
-      AtomicInteger deliveryAttempt = message.getHeaders().get("deliveryAttempt", AtomicInteger.class);
-      if (deliveryAttempt.get() > rabbitProperties.getRetries()) {
-        // giving up - don't send to DLX, instead send to failed exchange
-        // TODO think about copying headers with exception details
+      Map<String, Object> deathHeader = (Map<String, Object>) message.getHeaders()
+          .get("x-death", List.class).get(0);
+      if ((Long) deathHeader.get("count") > rabbitProperties.getRetries()) {
         messageService.saveMessage(message.getPayload());
+      } else {
+        throwExceptionWhileProcessing(message.getPayload());
       }
-      throwExceptionWhileProcessing(message.getPayload());
     };
   }
 
