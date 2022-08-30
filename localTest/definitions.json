@@ -56,7 +56,7 @@
       "configure": ".*",
       "write": ".*",
       "read": ".*"
-    },
+    }
   ],
   "topic_permissions": [],
   "parameters": [],
