@@ -17,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "rabbit-mq")
 public class RabbitProperties {
   private String exchangeName;
-  private String queueName;
   private String routingKey;
   private int interval;
   private int retries = 3;

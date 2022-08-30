@@ -30,7 +30,7 @@ public class MessageService {
             .withPayload(message)
             .setHeader(ROUTING_KEY_HEADER, rabbitProperties.getRoutingKey())
             .build());
-    log.info("Message: {} was sent to the queue: {}.", message, rabbitProperties.getQueueName());
+    log.info("Message: {} was sent to the exchange: {}.", message, rabbitProperties.getExchangeName());
   }
 
   public List<Message> getMessages() {
