@@ -5,13 +5,16 @@ import com.aqualen.epamrabbitmq.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Slf4j
 @RestController
@@ -27,6 +30,13 @@ public class MessagesController {
     messageService.publishMessage(message);
     return ResponseEntity.ok().build();
   }
+
+  @PostMapping("publish/dlq/test")
+  ResponseEntity<Void> publishDqlTestMessage() {
+    messageService.testDlq();
+    return ResponseEntity.ok().build();
+  }
+
 
   @GetMapping("all")
   ResponseEntity<List<Message>> getMessages() {
