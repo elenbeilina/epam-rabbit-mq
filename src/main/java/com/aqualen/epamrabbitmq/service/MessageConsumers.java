@@ -71,7 +71,14 @@ public class MessageConsumers {
   }
 
   @Bean
-  //Without this bean dlq does not bind to the queues
+  /*
+  When you want to use requeue mechanism - in props you need to declare:
+  spring.cloud.stream.rabbit.bindings.queue2Consumer-in-0.consumer.dlqDeadLetterExchange=
+  but with dlqDeadLetterExchange= empty - dlq does not bind to the queues.
+  When you just want broker to send messages to dlq - dlqDeadLetterExchange=message.dlq
+  and everything works fine without this bean, but requeue is not working.
+  In conclusion without this bean requeue + dlq mechanism does not work.
+   */
   public DeclarableCustomizer declarableCustomizer() {
     return declarable -> {
       if (declarable instanceof Queue) {
